@@ -1,7 +1,3 @@
-
-
-// TODO - Add to GitHub
-
 using VolumeTransitioner.Properties;
 using DefaultTimer = System.Timers.Timer;
 
