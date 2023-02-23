@@ -9,6 +9,7 @@
 	<PublishSingleFile>true</PublishSingleFile>
 	<SelfContained>true</SelfContained>
 	<PublishReadyToRun>true</PublishReadyToRun>
+	<ApplicationIcon>Resources\icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,12 +28,16 @@
   </ItemGroup>
 
   <ItemGroup>
-	  <Using Remove="System.Collections.Generic"/>
-	  <Using Remove="System.Drawing"/>
-	  <Using Remove="System.IO"/>
-	  <Using Remove="System.Linq"/>
-	  <Using Remove="System.Net.Http"/>
-	  <Using Remove="System.Threading.Tasks"/>
+	  <Using Remove="System.Collections.Generic" />
+	  <Using Remove="System.Drawing" />
+	  <Using Remove="System.IO" />
+	  <Using Remove="System.Linq" />
+	  <Using Remove="System.Net.Http" />
+	  <Using Remove="System.Threading.Tasks" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\icon.ico" />
   </ItemGroup>
 	
 </Project>
