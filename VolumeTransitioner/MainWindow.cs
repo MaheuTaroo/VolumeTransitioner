@@ -1,4 +1,5 @@
 using VolumeTransitioner.Properties;
+using VolumeTransitioner.Audio;
 using DefaultTimer = System.Timers.Timer;
 
 namespace VolumeTransitioner
@@ -6,7 +7,7 @@ namespace VolumeTransitioner
     public partial class MainWindow : Form
     {
         bool isOnMax = true, isChanging = false;
-        readonly DefaultTimer t = new(100);
+        readonly DefaultTimer t = new DefaultTimer(100);
 
         public MainWindow()
         {
@@ -15,6 +16,29 @@ namespace VolumeTransitioner
             nupMax.Value = (decimal)AudioManager.GetMasterVolume();
             nupMax.Minimum = 0;
             nupMax.Enabled = false;
+            t.Elapsed += delegate
+            {
+                if (AudioManager.GetMasterVolume() != (float)(isOnMax ? nupMax : nupMin).Value && !isChanging)
+                    AudioManager.SetMasterVolume((float)(isOnMax ? nupMax : nupMin).Value);
+            };
+            t.Start();
+        }
+
+        public MainWindow(int max, int min, bool onMax)
+        {
+            InitializeComponent();
+            Icon = Resources.icon;
+            nupMax.Value = max;
+            nupMin.Value = min;
+            isOnMax = onMax;
+
+            (isOnMax ? nupMax : nupMin).Enabled = false;
+
+            if (isOnMax && (int)AudioManager.GetMasterVolume() != nupMax.Value)
+                AudioManager.SetMasterVolume((float)nupMax.Value);
+            else if (!isOnMax && (int)AudioManager.GetMasterVolume() != nupMin.Value)
+                AudioManager.SetMasterVolume((float)nupMin.Value);
+
             t.Elapsed += delegate
             {
                 if (AudioManager.GetMasterVolume() != (float)(isOnMax ? nupMax : nupMin).Value && !isChanging)
@@ -44,10 +68,10 @@ namespace VolumeTransitioner
             }
             if (nupMin.Value > nupMax.Value) nupMax.Value = nupMin.Value;
         }
-        
+
         private void Toggle(object sender, EventArgs e)
         {
-            nupMax.Enabled = nupMin.Enabled = btnToggle.Enabled = false;
+            nupMax.Enabled = nupMin.Enabled = btnToggle.Enabled = mitSavePreset.Enabled = mitLoadPreset.Enabled = false;
             lblToggle.Text = "Toggling...";
             Update();
             float val = (float)(isOnMax ? nupMin.Value : nupMax.Value);
@@ -60,9 +84,56 @@ namespace VolumeTransitioner
             isOnMax = !isOnMax;
             if (AudioManager.GetMasterVolume() != (float)(isOnMax ? nupMax : nupMin).Value) AudioManager.SetMasterVolume((float)(isOnMax ? nupMax : nupMin).Value);
             isChanging = false;
-            lblToggle.Text = "Toggled to " + (isOnMax ? "max" : "min") + "imum value";
+            lblToggle.Text = $"Toggled to {(isOnMax ? "max" : "min")}imum value";
             btnToggle.BackgroundImage = isOnMax ? Resources.ToggleUp : Resources.ToggleDown;
-            (isOnMax ? nupMin : nupMax).Enabled = btnToggle.Enabled = true;
+            (isOnMax ? nupMin : nupMax).Enabled = btnToggle.Enabled = mitSavePreset.Enabled = mitLoadPreset.Enabled = true;
+        }
+
+        private void SavePreset(object sender, EventArgs e)
+        {
+            SaveFileDialog dialog = new SaveFileDialog()
+            {
+                Filter = "Volume Transitioner Preset|*.vtp",
+                ShowPinnedPlaces = true,
+                CheckWriteAccess = true
+            };
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                ExtraFunctions.SavePreset(dialog.FileName, (int)nupMax.Value, (int)nupMin.Value, isOnMax);
+            }
+        }
+
+        private void LoadPreset(object sender, EventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog()
+            {
+                Filter = "Volume Transitioner Preset|*.vtp",
+                ShowPinnedPlaces = true,
+                ShowHiddenFiles = true,
+                AddToRecent = true,
+                DereferenceLinks = true,
+                Multiselect = false,
+            };
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                int? max, min;
+                bool? onMax;
+                (max, min, onMax) = ExtraFunctions.LoadPreset(dialog.FileName);
+
+                if (max != null && min != null)
+                {
+                    nupMax.Value = (decimal)max;
+                    nupMin.Value = (decimal)min;
+                }
+
+                isOnMax = onMax ?? true;
+                if (isOnMax && (int)AudioManager.GetMasterVolume() != nupMax.Value)
+                    AudioManager.SetMasterVolume((float)nupMax.Value);
+                else if (!isOnMax && (int)AudioManager.GetMasterVolume() != nupMin.Value)
+                    AudioManager.SetMasterVolume((float)nupMin.Value);
+            }
         }
     }
 }
