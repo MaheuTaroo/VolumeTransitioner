@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace VolumeTransitioner
 {
@@ -625,23 +626,29 @@ namespace VolumeTransitioner
             }
         }
 
-        public static (int, int, bool) LoadPreset(string path)
+        public static (decimal, decimal, bool) LoadPreset(string path)
         {
-            int max, min;
+            decimal max, min;
             bool onMax;
             string[] txt = File.ReadAllLines(path);
             if (txt.Length != 3 ||
                 !(txt[0].StartsWith("MaxVol=") &&
                   txt[1].StartsWith("MinVol=") &&
                   txt[2].StartsWith("IsSetToMaxVol=")) ||
-                !(int.TryParse(txt[0].AsSpan("MaxVol=".Length), out max) &&
-                  int.TryParse(txt[1].AsSpan("MinVol=".Length), out min) &&
+                !(decimal.TryParse(txt[0].AsSpan("MaxVol=".Length), out max) &&
+                  decimal.TryParse(txt[1].AsSpan("MinVol=".Length), out min) &&
                   bool.TryParse(txt[2].AsSpan("IsSetToMaxVol=".Length), out onMax))) {
                 MessageBox.Show("The selected preset file does not contain the correct amount of needed properties. Please make sure that your preset file is correctly saved.", "Error loading preset", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return ((int)Audio.AudioManager.GetMasterVolume(), 0, true);
             }
 
             return (max, min, onMax);
+        }
+
+        public static void SetNumericUpDownValue(NumericUpDown control, decimal value)
+        {
+            control.Value = value;
+            control.Text = value.ToString();
         }
     }
 }

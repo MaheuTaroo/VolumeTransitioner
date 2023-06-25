@@ -1,6 +1,7 @@
 using VolumeTransitioner.Properties;
 using VolumeTransitioner.Audio;
 using DefaultTimer = System.Timers.Timer;
+using System.Reflection;
 
 namespace VolumeTransitioner
 {
@@ -24,7 +25,7 @@ namespace VolumeTransitioner
             t.Start();
         }
 
-        public MainWindow(int max, int min, bool onMax)
+        public MainWindow(decimal max, decimal min, bool onMax)
         {
             InitializeComponent();
             Icon = Resources.icon;
@@ -118,7 +119,12 @@ namespace VolumeTransitioner
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                (nupMax.Value, nupMin.Value, isOnMax) = ExtraFunctions.LoadPreset(dialog.FileName);
+                (decimal max, decimal min, bool onMax) = ExtraFunctions.LoadPreset(dialog.FileName);
+
+                ExtraFunctions.SetNumericUpDownValue(nupMax, max);
+                ExtraFunctions.SetNumericUpDownValue(nupMin, min);
+                nupMin.Enabled = isOnMax = onMax;
+                nupMax.Enabled = !onMax;
 
                 if (isOnMax && (int)AudioManager.GetMasterVolume() != nupMax.Value)
                     AudioManager.SetMasterVolume((float)nupMax.Value);

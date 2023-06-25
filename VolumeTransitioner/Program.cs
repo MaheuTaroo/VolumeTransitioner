@@ -16,11 +16,7 @@ namespace VolumeTransitioner
 
             if (args.Length > 0) 
             {
-                int max, min;
-                bool onMax;
-
-                (max, min, onMax) = ExtraFunctions.LoadPreset(args[0]);
-
+                (decimal max, decimal min, bool onMax) = ExtraFunctions.LoadPreset(args[0]);
                 Application.Run(new MainWindow(max, min, onMax));
             }
             else Application.Run(new MainWindow());
