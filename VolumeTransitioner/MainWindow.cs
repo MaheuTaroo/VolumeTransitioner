@@ -118,17 +118,8 @@ namespace VolumeTransitioner
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                int? max, min;
-                bool? onMax;
-                (max, min, onMax) = ExtraFunctions.LoadPreset(dialog.FileName);
+                (nupMax.Value, nupMin.Value, isOnMax) = ExtraFunctions.LoadPreset(dialog.FileName);
 
-                if (max != null && min != null)
-                {
-                    nupMax.Value = (decimal)max;
-                    nupMin.Value = (decimal)min;
-                }
-
-                isOnMax = onMax ?? true;
                 if (isOnMax && (int)AudioManager.GetMasterVolume() != nupMax.Value)
                     AudioManager.SetMasterVolume((float)nupMax.Value);
                 else if (!isOnMax && (int)AudioManager.GetMasterVolume() != nupMin.Value)

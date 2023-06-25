@@ -625,7 +625,7 @@ namespace VolumeTransitioner
             }
         }
 
-        public static (int?, int?, bool?) LoadPreset(string path)
+        public static (int, int, bool) LoadPreset(string path)
         {
             int max, min;
             bool onMax;
@@ -638,7 +638,7 @@ namespace VolumeTransitioner
                   int.TryParse(txt[1].AsSpan("MinVol=".Length), out min) &&
                   bool.TryParse(txt[2].AsSpan("IsSetToMaxVol=".Length), out onMax))) {
                 MessageBox.Show("The selected preset file does not contain the correct amount of needed properties. Please make sure that your preset file is correctly saved.", "Error loading preset", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return (null, null, null);
+                return ((int)Audio.AudioManager.GetMasterVolume(), 0, true);
             }
 
             return (max, min, onMax);

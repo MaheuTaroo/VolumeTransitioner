@@ -16,12 +16,12 @@ namespace VolumeTransitioner
 
             if (args.Length > 0) 
             {
-                int? max, min;
-                bool? onMax;
+                int max, min;
+                bool onMax;
 
                 (max, min, onMax) = ExtraFunctions.LoadPreset(args[0]);
 
-                Application.Run(new MainWindow(max ?? (int)AudioManager.GetMasterVolume(), min ?? 0, onMax ?? true));
+                Application.Run(new MainWindow(max, min, onMax));
             }
             else Application.Run(new MainWindow());
         }
